@@ -25,13 +25,13 @@ namespace WPHeatMap
             {
                 DepthEntry de;
                 string entry = r.ReadLine(); //Skip header line
-                bool beforeEndDate = false;
+                bool done = false;
                 do
                 {
                     entry = r.ReadLine();
                     de = new DepthEntry(entry);
-                    beforeEndDate = de.DateTime <= end;
-                    if (de.DateTime >= start && beforeEndDate)
+                    done = de.DateTime <= end;
+                    if (de.DateTime >= start && done)
                     {
                         
                         if (de.HighestBid > HighestBid)
@@ -42,8 +42,9 @@ namespace WPHeatMap
                         line++;
                         Entries.Add(de);
                     }
+                    done = (line >= targetRange);
                     
-                } while (!r.EndOfStream && beforeEndDate);
+                } while (!r.EndOfStream && done);
             }
         }
 

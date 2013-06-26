@@ -20,6 +20,13 @@ namespace WPHeatMap
     /// </summary>
     public partial class MainWindow : Window
     {
+        struct ARGB
+        {
+            public byte Blue;
+            public byte Green;
+            public byte Red;
+            public byte Alpha;
+        }
 
         public MainWindow()
         {
@@ -34,8 +41,7 @@ namespace WPHeatMap
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Create the bitmap, with the dimensions of the image placeholder.
-            wb = new WriteableBitmap((int)img.Width,
-           (int)img.Height, 96, 96, PixelFormats.Bgra32, null);
+            wb = new WriteableBitmap((int)img.Width, (int)img.Height, 96, 96, PixelFormats.Bgra32, null);
             // Define the update square (which is as big as the entire image).
             Int32Rect rect = new Int32Rect(0, 0, (int)img.Width, (int)img.Height);
             pixels = new byte[(int)img.Width * (int)img.Height * wb.Format.BitsPerPixel / 8];
@@ -87,8 +93,30 @@ namespace WPHeatMap
         {
             DepthRange dr = new DepthRange();
             dr.Build(DateTime.Parse("2013-06-07 00:00:11"), DateTime.Parse("2013-06-07 00:02:57"), (int)img.Width);
-            
-            
+
+            wb = new WriteableBitmap((int)img.Width, (int)img.Height, 96, 96, PixelFormats.Bgra32, null);
+            // Define the update square (which is as big as the entire image).
+            Int32Rect rect = new Int32Rect(0, 0, (int)img.Width, (int)img.Height);
+            ARGB[] pixels = new ARGB[(int)img.Width * (int)img.Height];
+            for (int x = 0; x < dr.Entries.Count; x++)
+            {
+                DepthEntry entry = dr.Entries[x];
+
+                for (int rr = 0; rr < entry.Bids.Length; rr++)
+                {
+
+                    int y = 10d / img.Height;
+                    int pixelOffset = (x + y * wb.PixelWidth);
+                    pixels[pixelOffset].Red = 255;
+                    pixels[pixelOffset].Alpha = 255;
+                }
+
+            }
+
+            // Copy the byte array into the image in one step.
+            stride = (wb.PixelWidth * wb.Format.BitsPerPixel) / 8;
+            wb.WritePixels(rect, pixels, stride, 0);
+            img.Source = wb;
         }
 
 
