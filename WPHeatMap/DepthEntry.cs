@@ -5,72 +5,85 @@ using System.Text;
 
 namespace WPHeatMap
 {
-
-    public class DepthSlice
-    {
-        public DepthSlice()
-        {
-
-        }
-
-
-    }
-
     class DepthEntry
     {
-        public DepthEntry()
-        {
-            
-        }
+        private const int DEPTH_MAX = 10;
+
         public DepthEntry(string line)
         {
-            LowBid = long.MaxValue;
             string[] split = line.Split(',');
-            Bids = new double[10];
-
-            for (int i = 0; i < 10; i++)
-            {
-                long bid;
-                long.TryParse(split[5 + i * 3], out bid);
-                Bids[i] = bid;
-                if (bid > HighBid)
-                    HighBid = bid;
-                if (bid > 0 && bid < LowBid)
-                    LowBid = bid;
-            }
-            Asks = new double[10];
-
-            for (int i = 0; i < 10; i++)
-            {
-                long ask;
-                long.TryParse(split[35 + i * 3], out ask);
-                Asks[i] = ask;
-                
-            }
-
-            DateTime date;
-            
-            DateTime.TryParse(split[1].Replace('D', ' '), out date);
-            this.DateTime = date;
-            
-
+            bids = ParseSizes(split, out lowestBid, out highestBid, 5);
+            asks = ParseSizes(split, out lowestAsk, out highestAsk, 35);
+            date = DateTime.Parse(split[1].Replace('D', ' '));
         }
 
-        public long HighBid { get; private set; }
-        public long LowBid { get; private set; }
-
-        public DateTime DateTime { get; private set; }
-
-        public double[] Bids
+        private long[] bids = new long[DEPTH_MAX];
+        public long[] Bids
         {
-            get;
-            private set;
+            get { return bids; }
         }
-        public double[] Asks
+
+        private long[] asks = new long[DEPTH_MAX];
+        public long[] Asks
         {
-            get;
-            private set;
+            get { return asks; }
         }
-    
+
+
+        private long[] ParseSizes(string[] split, out long low, out long high, int fi)
+        {
+            low = 0;
+            high = 0;
+            long[] target = new long[DEPTH_MAX];
+            for (int i = 0; i < DEPTH_MAX; i++)
+            {
+                long value;
+                long.TryParse(split[fi + i * 3], out value);
+                target[i] = value;
+                if (value > high)
+                    high = value;
+                else if (low == 0 || (value < low && value > 0))
+                    low = value;
+            }
+            return target;
+
+
+        }
+
+        private long lowestBid;
+        public long LowestBid
+        {
+            get { return lowestBid; }
+        }
+
+        private long highestBid;
+        public long HighestBid
+        {
+            get { return highestBid; }
+        }
+
+        private long lowestAsk;
+        public long LowestAsk
+        {
+            get { return lowestAsk; }
+        }
+
+        private long highestAsk;
+        public long HighestAsk
+        {
+            get { return highestAsk; }
+        }
+
+        private DateTime date;
+        public DateTime DateTime
+        {
+            get
+            {
+                return date;
+            }
+        }
+
+
+
     }
 }

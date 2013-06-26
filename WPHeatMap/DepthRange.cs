@@ -8,34 +8,49 @@ namespace WPHeatMap
 {
     class DepthRange
     {
+       
+
         public DepthRange()
         {
             LowestBid = long.MaxValue;
+            Entries = new List<DepthEntry>();
         }
 
-        public void Build(int low, int high)
+       
+
+        public void Build(DateTime start, DateTime end, int targetRange)
         {
             int line = 0;
             using (StreamReader r = File.OpenText("Data\\EURUSD_20130607_EBS_secondly.csv"))
             {
-
-                string entry = r.ReadLine(); ;
-                while (!r.EndOfStream && line <= high)
+                DepthEntry de;
+                string entry = r.ReadLine(); //Skip header line
+                bool beforeEndDate = false;
+                do
                 {
-                    if (line >= low)
+                    entry = r.ReadLine();
+                    de = new DepthEntry(entry);
+                    beforeEndDate = de.DateTime <= end;
+                    if (de.DateTime >= start && beforeEndDate)
                     {
-                        entry = r.ReadLine();
-                        DepthEntry de = new DepthEntry(entry);
-                        if (de.HighBid > HighestBid)
-                            HighestBid = de.HighBid;
-                        if (de.LowBid < LowestBid)
-                            LowestBid = de.LowBid;
+                        
+                        if (de.HighestBid > HighestBid)
+                            HighestBid = de.HighestBid;
+                        if (de.LowestBid > 0 && de.LowestBid < LowestBid)
+                            LowestBid = de.LowestBid;
 
-
+                        line++;
+                        Entries.Add(de);
                     }
-                    line++;
-                }
+                    
+                } while (!r.EndOfStream && beforeEndDate);
             }
+        }
+
+        public List<DepthEntry> Entries
+        {
+            get;
+            private set;
         }
 
         public long LowestBid { get; private set; }

@@ -24,44 +24,12 @@ namespace WPHeatMap
         public MainWindow()
         {
             InitializeComponent();
-            SetMinAndMax();
-        }
-
-        private void SetMinAndMax()
-        {
-            int lines = 0;
-            using (StreamReader r = File.OpenText("Data\\EURUSD_20130607_EBS_secondly.csv"))
-            {
-                while (!r.EndOfStream)
-                {
-                    lines++;
-                    r.ReadLine();
-                }
-            }
-
-            slider_start.Maximum = lines;
-            slider_end.Maximum = lines;
-
         }
 
 
-        private void Plot()
-        {
-            DepthRange d = new DepthRange();
-            d.Build(1, 5000);
-
-
-
-
-        }
-
-        WriteableBitmap writeableBitmap;
         WriteableBitmap wb;
         byte[] pixels;
         int stride;
-        private void Poo()
-        {
-        }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -117,15 +85,10 @@ namespace WPHeatMap
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            int pixelOffset = 0;// (1 + 1 * wb.PixelWidth) * wb.Format.BitsPerPixel / 8;
-             pixels = new byte[1 * 1 * wb.Format.BitsPerPixel / 8];
-            pixels[pixelOffset] = (byte)128;
-            pixels[pixelOffset + 1] = (byte)50;
-            pixels[pixelOffset + 2] = (byte)50;
-
-            pixels[pixelOffset + 3] = (byte)255;
-            Int32Rect r = new Int32Rect(100, 100, 1, 1);
-            wb.WritePixels(r, pixels, stride, 0);
+            DepthRange dr = new DepthRange();
+            dr.Build(DateTime.Parse("2013-06-07 00:00:11"), DateTime.Parse("2013-06-07 00:02:57"), (int)img.Width);
+            
+            
         }
 
 
