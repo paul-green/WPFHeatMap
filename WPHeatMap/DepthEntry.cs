@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WPHeatMap
 {
-    class DepthEntry
+    public class DepthEntry
     {
         private const int DEPTH_MAX = 10;
 
